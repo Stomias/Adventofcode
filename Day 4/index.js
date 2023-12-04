@@ -1,27 +1,28 @@
 const fs = require('fs');
 
 fs.readFile('./data.txt', 'utf8', function(err, data){
-    let sumOfAllPoints = 0
+    let numberOfCards = 0
     const cards = data.split(/\r?\n|\r|\n/g).map((data) => {
-        data = data.replace(/  /g, " ").replace(/Card [0-9]+: /g, "").split(" | ")
-        data[0] = data[0].split((' '))
-        data[1] = data[1].split((' '))
-        
+        data = data.replace(/  /g, " ");
+        data = data.split(": ")
+        data[1] = data[1].split(" | ")
+        data[1][0] = data[1][0].split((' '))
+        data[1][1] = data[1][1].split((' '))
+        data.numberOfCards = 1
         return data
     });
-    cards.forEach((card, index) => {
-        let actualPoints = 0;
+    cards.forEach((card, indexOfCard) => {
         let numberFound = []
-        card[1].forEach(number => {
-            if (actualPoints === 0 && card[0].includes(number) && !numberFound.includes(number)) {
+        card[1][1].forEach(number => {
+            if (card[1][0].includes(number) && !numberFound.includes(number)) {
                 numberFound.push(number)
-                actualPoints += 1
-            } else if (card[0].includes(number) && !numberFound.includes(number)) {
-                numberFound.push(number)
-                actualPoints = actualPoints * 2
             }
         })
-        sumOfAllPoints += actualPoints
+        numberOfCards += card.numberOfCards
+        for (let index = indexOfCard + 1; index <= indexOfCard + numberFound.length; index++) {
+            cards[index].numberOfCards += card.numberOfCards;
+        }
     })
-    console.log(sumOfAllPoints)
+
+    console.log(numberOfCards)
 })
